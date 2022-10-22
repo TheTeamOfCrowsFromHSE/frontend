@@ -3,7 +3,5 @@ import { Hits } from 'react-instantsearch-dom';
 import { Product } from './Product';
 
 export const Products = () => (
-    <div className='right-panel'> 
-        <Hits hitComponent={Product} />
-    </div>
+    <Hits hitComponent={Product} className="flex flex-row flex-wrap" />
 )
