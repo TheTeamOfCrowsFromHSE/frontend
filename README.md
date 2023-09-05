@@ -1,70 +1,124 @@
-# Getting Started with Create React App
+# search-engine — the mechanism for searching for products on the supplier's portal
+> ## Prehistory
+> On November 21-23 2022, the "Thunder Hack" hackathon was held in our city and we, 
+> 5 students from the HSE university, joined a team and went to participate in this event. 
+> We were tasked with developing `a search engine mechanism on the supplier's portal`.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
-## Available Scripts
+# Table of contents
+- [The problem and the data provided](#the-problem-and-the-data-provided)
+- [Solution / Features / Result](#solution--features--result)
+- [Installation](#installation)
+- [The License](#the-license)
 
-In the project directory, you can run:
+# The problem and the data provided
+> We were tasked with developing `a search engine mechanism on the supplier's portal`. 
+> \
+> And we got two excel tables: first file — 49.6Mb, second file — 94.8Mb
+> (the largest table had 400k rows and 10 columns 😰).
 
-### `yarn start`
+[🔝Table of contents](#table-of-contents)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Solution / Features / Result
+- Solution: In our solution we used [`meilisearch`](#https://github.com/meilisearch/meilisearch) library, which helps us to do search.  
+  - We have :
+    - frontend on `HTML`,`CSS`,`JavaScript -> ReactJS` 
+    - backend on `Java -> Spring Framework`
+    - convertor `.xlsx` to `json` on `Python`
+  - Solution scheme : 
+  
+  ![](./docs/images/2.png)
+- Features :
+  - real-time search
+  - any(random) register of characters
+  - search with multiple errors
+- Result (demonstration of multiple requests) :
+  - Request -> `бекант письменный стол` (small register)
+  
+  ![](./docs/gifs/1.gif)
+  
+  - Request -> `jump мяч волейбольный` (contains different languages)
+  
+  ![](./docs/gifs/2.gif)
+  
+  - Request -> `ЭлЕкТроГИтара` (random register)
+  
+  ![](./docs/gifs/3.gif)
+  
+  - Request -> `ЕФРОСИНА ЛИТЕРАТУРА` (large register and errors in spelling of last name)
+  
+  ![](./docs/gifs/4.gif)
+  
+  - Request -> `шлогбауум` (several errors)
+  
+  ![](./docs/gifs/5.gif)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `yarn test`
+[🔝Table of contents](#table-of-contents)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Installation
+If you want to install and run this mechanism, you should:
+- [clone repository](#clone-repository)
+- [install docker container `meilisearch`](#install-docker-container-meilisearch)
+- [run docker container](#run-docker-container)
+- [add documents](#add-documents)
+- [build and run program](#build-and-run-program)
 
-### `yarn build`
+## clone repository
+```
+$ git clone https://github.com/TheTeamOfCrowsFromHSE/search-engine.git
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## install docker container `meilisearch`
+```
+$ docker pull getmeili/meilisearch:v0.27.0
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## run docker container
+```
+$ docker run -it --rm \
+    -p 7700:7700 \
+    -v $(pwd)/meili_data:/meili_data \
+    getmeili/meilisearch:v0.27.0 \
+    meilisearch --env="development"
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## add documents
+If we want to add data that will be searched, we should add them to meilisearch.
+> ❗ data is `json` file. \
+> ❗file name is `movies.json`.
+```
+$ curl \                  
+  -X POST 'http://localhost:7700/indexes/movies/documents' \
+  -H 'Content-Type: application/json' \
+  --data-binary @movies.json
+```
+> P.S. If you receive an error message
+> ```
+> {"message":"JSON payload (16178973 bytes)is larger than allowed (limit:2097152 bytes).","code":"internal","type":"internal","link":"https://docs.meilisearch.com/errors#internal"}
+> ```
+> you should write the flag `--http-payload-size-limit=300000000` when running the docker container
 
-### `yarn eject`
+## build and run program
+After all the above steps, you can build and run the program.
+\
+After run program go to `http://localhost:8080/` in browser.
+\
+If everything went well, you will see the cards:
+![](./docs/images/1.png)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+[🔝Installation](#installation)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+> P.S. In the future, if you want to run this mechanism, you should repeat steps: 
+> \
+> [`run docker container`](#run-docker-container), 
+> \
+> [`build and run program`](#build-and-run-program).
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+[🔝Table of contents](#table-of-contents)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# The License
+`search-engine` is distributed under the [MIT License](https://github.com/TheTeamOfCrowsFromHSE/search-engine/blob/main/LICENSE), on behalf of TheTeamOfCrowsFromHSE.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[🔝Table of contents](#table-of-contents)
